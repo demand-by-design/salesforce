@@ -73,7 +73,7 @@ class Salesforce {
         $this->response = $this->apiHttpRequest($path, $params, $method);
         // Throw an error if we still have bad response.
         if (!in_array($this->response->code, array(200, 201, 204))) {
-          throw new SalesforceException($this->response->error, $this->response->code);
+          throw new SalesforceException(check_plain($this->response->error), $this->response->code);
         }
 
         break;
@@ -87,7 +87,7 @@ class Salesforce {
       default:
         // We have problem and no specific Salesforce error provided.
         if (empty($this->response->data)) {
-          throw new SalesforceException($this->response->error, $this->response->code);
+          throw new SalesforceException(check_plain($this->response->error), $this->response->code);
         }
     }
 
@@ -97,11 +97,11 @@ class Salesforce {
     }
 
     if (isset($data['error'])) {
-      throw new SalesforceException($data['error_description'], $data['error']);
+      throw new SalesforceException(check_plain($data['error_description']), $data['error']);
     }
 
     if (!empty($data['errorCode'])) {
-      throw new SalesforceException($data['message'], $this->response->code);
+      throw new SalesforceException(check_plain($data['message']), $this->response->code);
     }
 
     return $data;
@@ -260,7 +260,7 @@ class Salesforce {
     $data = drupal_json_decode($response->data);
 
     if (isset($data['error'])) {
-      throw new SalesforceException($data['error_description'], $data['error']);
+      throw new SalesforceException(check_plain($data['error_description']), $data['error']);
     }
 
     $this->setAccessToken($data['access_token']);
@@ -339,7 +339,7 @@ class Salesforce {
 
     if ($response->code != 200) {
       $error = isset($data['error_description']) ? $data['error_description'] : $response->error;
-      throw new SalesforceException($error, $response->code);
+      throw new SalesforceException(check_plain($error), $response->code);
     }
 
     // Ensure all required attributes are returned. They can be omitted if the
